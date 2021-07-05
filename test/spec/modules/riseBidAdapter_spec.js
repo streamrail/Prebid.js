@@ -260,7 +260,8 @@ describe('riseAdapter', function () {
       height: 480,
       requestId: '21e12606d47ba7',
       netRevenue: true,
-      currency: 'USD'
+      currency: 'USD',
+      adomain: ['abc.com']
     };
 
     it('should get correct bid response', function () {
@@ -275,7 +276,10 @@ describe('riseAdapter', function () {
           netRevenue: true,
           ttl: TTL,
           vastXml: '<VAST version="3.0"></VAST>',
-          mediaType: VIDEO
+          mediaType: VIDEO,
+          meta: {
+            advertiserDomains: ['abc.com']
+          }
         }
       ];
       const result = spec.interpretResponse({ body: response });

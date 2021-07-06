@@ -5,7 +5,7 @@ import {config} from '../src/config.js';
 
 const SUPPORTED_AD_TYPES = [VIDEO];
 const BIDDER_CODE = 'rise';
-const BIDDER_VERSION = '4.0.0';
+const BIDDER_VERSION = '4.0.1';
 const TTL = 360;
 const CURRENCY = 'USD';
 const SELLER_ENDPOINT = 'https://hb.yellowblue.io/';

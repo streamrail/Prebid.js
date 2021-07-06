@@ -3,6 +3,7 @@ import { spec } from 'modules/riseBidAdapter.js';
 import { newBidder } from 'src/adapters/bidderFactory.js';
 import { config } from 'src/config.js';
 import { VIDEO } from '../../../src/mediaTypes.js';
+import { deepClone } from 'src/utils.js';
 
 const ENDPOINT = 'https://hb.yellowblue.io/hb';
 const TEST_ENDPOINT = 'https://hb.yellowblue.io/hb-test';
@@ -249,6 +250,34 @@ describe('riseAdapter', function () {
         expect(request.data).to.be.an('object');
         expect(request.data).to.have.property('schain', '1.0,1!indirectseller.com,00001,,,,');
       }
+    });
+
+    it('should set floor_price to getFloor.floor value if it is greater than params.floorPrice', function() {
+      const bid = deepClone(bidRequests[0]);
+      bid.getFloor = () => {
+        return {
+          currency: 'USD',
+          floor: 3.32
+        }
+      }
+      bid.params.floorPrice = 0.64;
+      const request = spec.buildRequests([bid], bidderRequest)[0];
+      expect(request.data).to.be.an('object');
+      expect(request.data).to.have.property('floor_price', 3.32);
+    });
+
+    it('should set floor_price to params.floorPrice value if it is greater than getFloor.floor', function() {
+      const bid = deepClone(bidRequests[0]);
+      bid.getFloor = () => {
+        return {
+          currency: 'USD',
+          floor: 0.8
+        }
+      }
+      bid.params.floorPrice = 1.5;
+      const request = spec.buildRequests([bid], bidderRequest)[0];
+      expect(request.data).to.be.an('object');
+      expect(request.data).to.have.property('floor_price', 1.5);
     });
   });
 

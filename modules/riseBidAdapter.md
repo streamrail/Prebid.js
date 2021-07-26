@@ -44,7 +44,7 @@ var adUnits = [
             org: '56f91cd4d3e3660002000033', // Required
             floorPrice: 2.00, // Optional
             ifa: 'XXX-XXX', // Optional
-            placementId: '12345678',
+            placementId: '12345678', // Optional
             testMode: false // Optional
           }
         }]

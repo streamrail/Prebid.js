@@ -227,6 +227,7 @@ function generateParameters(bid, bidderRequest) {
     tmax: timeout,
     width: width,
     height: height,
+    placement_id: params.placementId,
     publisher_id: params.org,
     floor_price: Math.max(getFloor(bid), params.floorPrice),
     ua: navigator.userAgent,

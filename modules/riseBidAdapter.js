@@ -227,7 +227,6 @@ function generateParameters(bid, bidderRequest) {
     tmax: timeout,
     width: width,
     height: height,
-    placement_id: params.placementId,
     publisher_id: params.org,
     floor_price: Math.max(getFloor(bid), params.floorPrice),
     ua: navigator.userAgent,
@@ -239,6 +238,10 @@ function generateParameters(bid, bidderRequest) {
     site_domain: domain,
     bidder_version: BIDDER_VERSION
   };
+
+  if (params.placementId) {
+    requestParams.placement_id = params.placementId;
+  }
 
   if (syncEnabled) {
     const allowedSyncMethod = getAllowedSyncMethod(filterSettings, bidderCode);

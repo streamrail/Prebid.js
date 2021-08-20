@@ -62,13 +62,20 @@ export const spec = {
 
     return bidResponses;
   },
-  getUserSyncs: function(syncOptions, serverResponses) {
+  getUserSyncs: function(syncOptions, serverResponses, gdprConsent) {
     const syncs = [];
     for (const response of serverResponses) {
       if (syncOptions.iframeEnabled && response.body.userSyncURL) {
+        let userSyncURL = response.body.userSyncURL;
+
+        if (gdprConsent) {
+          userSyncURL = utils.tryAppendQueryString(userSyncURL, 'gdpr', (gdprConsent.gdprApplies ? 1 : 0));
+          userSyncURL = utils.tryAppendQueryString(userSyncURL, 'gdpr_consent', gdprConsent.consentString);
+        }
+
         syncs.push({
           type: 'iframe',
-          url: response.body.userSyncURL
+          url: userSyncURL
         });
       }
       if (syncOptions.pixelEnabled && utils.isArray(response.body.userSyncPixels)) {

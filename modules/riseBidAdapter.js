@@ -62,7 +62,7 @@ export const spec = {
 
     return bidResponses;
   },
-  getUserSyncs: function(syncOptions, serverResponses, gdprConsent) {
+  getUserSyncs: function(syncOptions, serverResponses, gdprConsent, uspConsent) {
     const syncs = [];
     for (const response of serverResponses) {
       if (syncOptions.iframeEnabled && response.body.userSyncURL) {
@@ -71,6 +71,10 @@ export const spec = {
         if (gdprConsent) {
           userSyncURL = utils.tryAppendQueryString(userSyncURL, 'gdpr', (gdprConsent.gdprApplies ? 1 : 0));
           userSyncURL = utils.tryAppendQueryString(userSyncURL, 'gdpr_consent', gdprConsent.consentString);
+        }
+
+        if (uspConsent) {
+          userSyncURL = utils.tryAppendQueryString(userSyncURL, 'us_privacy', uspConsent);
         }
 
         syncs.push({

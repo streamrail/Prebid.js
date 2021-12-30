@@ -73,13 +73,24 @@ export const spec = {
 
     return bidResponses;
   },
-  getUserSyncs: function(syncOptions, serverResponses) {
+  getUserSyncs: function(syncOptions, serverResponses, gdprConsent, uspConsent) {
     const syncs = [];
     for (const response of serverResponses) {
       if (syncOptions.iframeEnabled && response.body.userSyncURL) {
+        let userSyncURL = response.body.userSyncURL;
+
+        if (gdprConsent) {
+          userSyncURL = utils.tryAppendQueryString(userSyncURL, 'gdpr', (gdprConsent.gdprApplies ? 1 : 0));
+          userSyncURL = utils.tryAppendQueryString(userSyncURL, 'gdpr_consent', gdprConsent.consentString);
+        }
+
+        if (uspConsent) {
+          userSyncURL = utils.tryAppendQueryString(userSyncURL, 'us_privacy', uspConsent);
+        }
+
         syncs.push({
           type: 'iframe',
-          url: response.body.userSyncURL
+          url: userSyncURL
         });
       }
       if (syncOptions.pixelEnabled && isArray(response.body.userSyncPixels)) {

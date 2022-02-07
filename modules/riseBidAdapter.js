@@ -68,8 +68,10 @@ export const spec = {
       data: combinedRequestsObject
     }
   },
-  interpretResponse: function ({body}) {
+  interpretResponse: function ({body}, bidderRequest) {
     const bidResponses = [];
+    let requestBidErrors = bidderRequest.data;
+
 
     if (body.bids) {
       body.bids.forEach(adUnit => {
@@ -100,6 +102,16 @@ export const spec = {
 
         bidResponses.push(bidResponse);
       });
+    }
+
+    if (deepAccess(requestBidErrors, 'errors')) {
+      if (storage.localStorageIsEnabled()) {
+        try {
+          storage.removeDataFromLocalStorage(LOCAL_STORAGE_KEY);
+        } catch (e) {
+          logError('rise cannot clear rpsk8 from localStorage.');
+        }
+      }
     }
 
     return bidResponses;
@@ -472,10 +484,10 @@ function storeErrorEventData(data) {
     }
   });
 
-  if (data.type === 'WARNING' && data.arguments && data.arguments[1] && data.arguments[1].bidder === BIDDER_CODE) {
+  if (data.type === 'WARNING' && data.arguments) {
     const todayString = todayDate.toISOString().slice(0, 10);
 
-    const errorCode = data.arguments[1].code;
+    const errorCode = 6;
 
     if (errorCode) {
       currentStorage[todayString] = currentStorage[todayString] || {};

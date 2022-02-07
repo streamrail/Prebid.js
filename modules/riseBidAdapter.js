@@ -1,7 +1,10 @@
-import { logWarn, logInfo, isArray, isFn, deepAccess, isEmpty, contains, timestamp, getBidIdParameter, triggerPixel } from '../src/utils.js';
+import { logWarn, logInfo, isArray, isFn, deepAccess, isEmpty, contains, timestamp, getBidIdParameter, triggerPixel, hasDeviceAccess } from '../src/utils.js';
 import {registerBidder} from '../src/adapters/bidderFactory.js';
 import {BANNER, VIDEO} from '../src/mediaTypes.js';
 import {config} from '../src/config.js';
+import CONSTANTS from '../src/constants.json';
+import events from '../src/events.js';
+import { getStorageManager, validateStorageEnforcement } from '../src/storageManager.js';
 
 const SUPPORTED_AD_TYPES = [BANNER, VIDEO];
 const BIDDER_CODE = 'rise';
@@ -17,13 +20,19 @@ const SUPPORTED_SYNC_METHODS = {
   IFRAME: 'iframe',
   PIXEL: 'pixel'
 }
+const GVLID = 1043;
+const LOCAL_STORAGE_KEY = 'rpsk8';
+export const storage = getStorageManager(GVLID, BIDDER_CODE);
 
 export const spec = {
   code: BIDDER_CODE,
-  gvlid: 1043,
+  gvlid: GVLID,
   version: ADAPTER_VERSION,
   supportedMediaTypes: SUPPORTED_AD_TYPES,
+
   isBidRequestValid: function (bidRequest) {
+    events.on(CONSTANTS.EVENTS.AUCTION_DEBUG, localStorageHandler);
+
     if (!bidRequest.params) {
       logWarn('no params have been set to Rise adapter');
       return false;
@@ -45,6 +54,13 @@ export const spec = {
 
     combinedRequestsObject.params = generateGeneralParams(generalObject, bidderRequest);
     combinedRequestsObject.bids = generateBidsParams(validBidRequests, bidderRequest);
+
+    // Get cached errors stored in LocalStorage
+    const cachedErrors = getCachedErrors();
+
+    if (!isEmpty(cachedErrors)) {
+      combinedRequestsObject.errors = cachedErrors;
+    }
 
     return {
       method: 'POST',
@@ -94,12 +110,10 @@ export const spec = {
       if (syncOptions.iframeEnabled && response.body.params.userSyncURL) {
         syncs.push({
           type: 'iframe',
-          // TODO: verify url is correct
           url: response.body.params.userSyncURL
         });
       }
       if (syncOptions.pixelEnabled && isArray(response.body.params.userSyncPixels)) {
-        // TODO: verify pixels is correct
         const pixels = response.body.params.userSyncPixels.map(pixel => {
           return {
             type: 'image',
@@ -412,4 +426,100 @@ function generateGeneralParams(generalObject, bidderRequest) {
   }
 
   return generalParams
+}
+
+function localStorageHandler(data) {
+  if (data.type === 'WARNING' && data.arguments) {
+    const DEFAULT_ENFORCEMENT_SETTINGS = {
+      hasEnforcementHook: false,
+      valid: hasDeviceAccess()
+    };
+    validateStorageEnforcement(GVLID, BIDDER_CODE, DEFAULT_ENFORCEMENT_SETTINGS, (permissions) => {
+      if (permissions.valid) {
+        storeErrorEventData(data);
+      }
+    });
+  }
+}
+
+/**
+ * @typedef {Array[message: string, err: Object<bidder: string, code: number>]} ErrorData
+ * @property {string} message - The error message.
+ * @property {object} err - The error object.
+ * @property {string} err.bidder - The bidder of the error.
+ * @property {string} err.code - The error code.
+ */
+function storeErrorEventData(data) {
+  if (!storage.localStorageIsEnabled()) {
+    return;
+  }
+
+  let currentStorage;
+
+  try {
+    currentStorage = JSON.parse(storage.getDataFromLocalStorage(LOCAL_STORAGE_KEY) || '{}');
+  } catch (e) {
+    logWarn('rise adapter cannot read rpsk8 from localStorage.');
+  }
+
+  const todayDate = new Date();
+
+  Object.keys(currentStorage).map((errorDate) => {
+    const date = new Date(errorDate);
+
+    if (date.setDate(date.getDate() + 7) - todayDate < 0) {
+      delete currentStorage[errorDate];
+    }
+  });
+
+  if (data.type === 'WARNING' && data.arguments && data.arguments[1] && data.arguments[1].bidder === BIDDER_CODE) {
+    const todayString = todayDate.toISOString().slice(0, 10);
+
+    const errorCode = data.arguments[1].code;
+
+    if (errorCode) {
+      currentStorage[todayString] = currentStorage[todayString] || {};
+
+      if (!Number(currentStorage[todayString][errorCode])) {
+        currentStorage[todayString][errorCode] = 0;
+      }
+
+      currentStorage[todayString][errorCode]++;
+    };
+  }
+
+  storage.setDataInLocalStorage(LOCAL_STORAGE_KEY, JSON.stringify(currentStorage));
+}
+
+/**
+ * Get  stored in LocalStorage and format to be added to request payload
+ *
+ * @returns {Object} Object with error codes and counts
+ */
+function getCachedErrors() {
+  if (!storage.localStorageIsEnabled()) {
+    return;
+  }
+
+  const errors = {};
+  let currentStorage;
+
+  try {
+    currentStorage = JSON.parse(storage.getDataFromLocalStorage(LOCAL_STORAGE_KEY) || '{}');
+  } catch (e) {
+    logError('rise adapter cannot read rpsk8 from localStorage.');
+    return null;
+  }
+
+  Object.keys(currentStorage).forEach((date) => {
+    Object.keys(currentStorage[date]).forEach((code) => {
+      if (typeof currentStorage[date][code] === 'number') {
+        errors[code] = errors[code]
+          ? errors[code] + currentStorage[date][code]
+          : currentStorage[date][code];
+      }
+    });
+  });
+
+  return errors;
 }

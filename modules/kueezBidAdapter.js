@@ -299,7 +299,7 @@ function generateSharedParams(sharedParams, bidderRequest) {
     auction_start: timestamp(),
     device_type: getDeviceType(),
     dnt: (navigator.doNotTrack === 'yes' || navigator.doNotTrack === '1' || navigator.msDoNotTrack === '1') ? 1 : 0,
-    publisher_id: generalBidParams.publisherId,
+    publisher_id: generalBidParams.org,
     publisher_name: domain,
     session_id: getBidIdParameter('auctionId', sharedParams),
     site_domain: domain,
@@ -367,8 +367,8 @@ function validateParams(bidRequest) {
     isValid = false;
   }
 
-  if (!bidRequest.params.publisherId) {
-    logWarn('Kueez adapter - publisherId is a required param');
+  if (!bidRequest.params.org) {
+    logWarn('Kueez adapter - org is a required param');
     isValid = false;
   }
 

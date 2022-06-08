@@ -18,7 +18,7 @@ The adapter supports Banner and Video(instream) media types.
 
 | Name          | Scope | Type | Description                                                       | Example
 |---------------| ----- | ---- |-------------------------------------------------------------------| -------
-| `publisherId` | required | String | the publisher Id provided by your Kueez representative             | "test-publisher-id"
+| `org` | required | String | the organization Id provided by your Kueez representative         | "test-publisher-id"
 | `floorPrice`  | optional | Number | Minimum price in USD. Misuse of this parameter can impact revenue | 1.50
 | `placementId` | optional | String | A unique placement identifier                                     | "12345678"
 | `testMode`    | optional | Boolean | This activates the test mode                                      | false

@@ -25,7 +25,7 @@ describe('kueezBidAdapter', function () {
       'adUnitCode': 'adunit-code',
       'sizes': [['640', '480']],
       'params': {
-        'publisherId': 'test-publisher-id'
+        'org': 'test-publisher-id'
       }
     };
 
@@ -37,7 +37,7 @@ describe('kueezBidAdapter', function () {
       const newBid = Object.assign({}, bid);
       delete newBid.params;
       newBid.params = {
-        'publisherId': null
+        'org': null
       };
       expect(spec.isBidRequestValid(newBid)).to.equal(false);
     });
@@ -50,7 +50,7 @@ describe('kueezBidAdapter', function () {
         'adUnitCode': 'adunit-code',
         'sizes': [[640, 480]],
         'params': {
-          'publisherId': 'test-publisher-id'
+          'org': 'test-publisher-id'
         },
         'bidId': '5wfg9887sd5478',
         'bidderRequestId': 'op87952ewq8567',
@@ -68,7 +68,7 @@ describe('kueezBidAdapter', function () {
         'adUnitCode': 'adunit-code',
         'sizes': [[300, 250]],
         'params': {
-          'publisherId': 'test-publisher-id'
+          'org': 'test-publisher-id'
         },
         'bidId': '5wfg9887sd5478',
         'bidderRequestId': 'op87952ewq8567',
@@ -87,7 +87,7 @@ describe('kueezBidAdapter', function () {
         'adUnitCode': 'adunit-code',
         'sizes': [[640, 480]],
         'params': {
-          'publisherId': 'test-publisher-id',
+          'org': 'test-publisher-id',
           'testMode': true
         },
         'bidId': '5wfg9887sd5478',
@@ -468,7 +468,7 @@ describe('kueezBidAdapter', function () {
         'sizes': [['640', '480']],
         'nurl': 'http://example.com/win/1234',
         'params': {
-          'publisherId': 'test-publisher-id'
+          'org': 'test-publisher-id'
         }
       };
 

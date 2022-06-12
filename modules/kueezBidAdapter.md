@@ -6,7 +6,6 @@ Module Type: Bidder Adapter
 
 Maintainer: prebid@kueez.com
 
-
 # Description
 
 The Kueez adapter requires setup and approval from the Kueez team. Please reach out to prebid@kueez.com for more information.
@@ -14,6 +13,7 @@ The Kueez adapter requires setup and approval from the Kueez team. Please reach 
 The adapter supports Banner and Video(instream) media types.
 
 # Bid Parameters
+
 ## Video
 
 | Name          | Scope | Type | Description                                                       | Example
@@ -24,26 +24,50 @@ The adapter supports Banner and Video(instream) media types.
 | `testMode`    | optional | Boolean | This activates the test mode                                      | false
 
 # Test Parameters
+
 ```javascript
-var adUnits = [
-       {
-        code: 'dfp-video-div',
-        sizes: [[640, 480]],
-        mediaTypes: {
-          video: {
-            playerSize: [[640, 480]],
-            context: 'instream'
-          }
-        },
-        bids: [{
-          bidder: 'kueez',
-          params: {
-            org: 'test-publisher-id', // Required
-            floorPrice: 1.50, // Optional
-            placementId: '12345678', // Optional
-            testMode: false // Optional
-          }
-        }]
+var adUnits = [{
+  code: 'banner-div',
+  mediaTypes: {
+    banner: {
+      sizes: [
+        [300, 250],
+        [728, 90]
+      ]
+    }
+  },
+  bids: [{
+    bidder: 'kueez',
+    params: {
+      org: 'test-org-id', // Required
+      floorPrice: 0.10, // Optional
+      placementId: '12345678', // Optional
+      testMode: false // Optional
+    }
+  }]
+},
+  {
+    code: 'dfp-video-div',
+    sizes: [
+      [640, 480]
+    ],
+    mediaTypes: {
+      video: {
+        playerSize: [
+          [640, 480]
+        ],
+        context: 'instream'
       }
-   ];
+    },
+    bids: [{
+      bidder: 'kueez',
+      params: {
+        org: 'test-org-id', // Required
+        floorPrice: 2.00, // Optional
+        placementId: '12345678', // Optional
+        testMode: false // Optional
+      }
+    }]
+  }
+];
 ```

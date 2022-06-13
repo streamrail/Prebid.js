@@ -42,7 +42,7 @@ var adUnits = [{
       org: 'test-org-id', // Required
       floorPrice: 0.10, // Optional
       placementId: '12345678', // Optional
-      testMode: false // Optional
+      testMode: true // Optional
     }
   }]
 },
@@ -65,7 +65,7 @@ var adUnits = [{
         org: 'test-org-id', // Required
         floorPrice: 2.00, // Optional
         placementId: '12345678', // Optional
-        testMode: false // Optional
+        testMode: true // Optional
       }
     }]
   }

@@ -370,6 +370,16 @@ function generateBidParameters(bid, bidderRequest) {
     if (coppa) {
       bidObject.coppa = 1;
     }
+
+    const plcmt = deepAccess(bid, 'mediaTypes.video.plcmt');
+    if (plcmt) {
+      bidObject.plcmt = plcmt;
+    }
+
+    const sua = deepAccess(bid, 'ortb2.device.sua');
+    if (sua) {
+      bidObject.sua = sua;
+    }
   }
 
   return bidObject;

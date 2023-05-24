@@ -349,6 +349,30 @@ describe('riseAdapter', function () {
     });
 
     it('should check sua param in bid request', function() {
+      const sua = {
+        'platform': {
+          'brand': 'macOS',
+          'version': ['12', '4', '0']
+        },
+        'browsers': [
+          {
+            'brand': 'Chromium',
+            'version': [ '106', '0', '5249', '119' ]
+          },
+          {
+            'brand': 'Google Chrome',
+            'version': [ '106', '0', '5249', '119' ]
+          },
+          {
+            'brand': 'Not;A=Brand',
+            'version': [ '99', '0', '0', '0' ]
+          }
+        ],
+        'mobile': 0,
+        'model': '',
+        'bitness': '64',
+        'architecture': 'x86'
+      }
       const bid = utils.deepClone(bidRequests[0]);
       bid.ortb2 = {
         'device': {
@@ -381,31 +405,7 @@ describe('riseAdapter', function () {
       const requestWithSua = spec.buildRequests([bid], bidderRequest);
       const data = requestWithSua.data;
       expect(data.bids[0].sua).to.exist;
-      expect(data.bids[0].sua).to.deep.equal({
-        'platform': {
-          'brand': 'macOS',
-          'version': ['12', '4', '0']
-        },
-        'browsers': [
-          {
-            'brand': 'Chromium',
-            'version': [ '106', '0', '5249', '119' ]
-          },
-          {
-            'brand': 'Google Chrome',
-            'version': [ '106', '0', '5249', '119' ]
-          },
-          {
-            'brand': 'Not;A=Brand',
-            'version': [ '99', '0', '0', '0' ]
-          }
-        ],
-        'mobile': 0,
-        'model': '',
-        'bitness': '64',
-        'architecture': 'x86'
-      }
-      );
+      expect(data.bids[0].sua).to.deep.equal(sua);
       const request = spec.buildRequests(bidRequests, bidderRequest);
       expect(request.data.bids[0].sua).to.not.exist;
     });

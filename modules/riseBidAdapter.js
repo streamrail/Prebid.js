@@ -426,6 +426,11 @@ function generateGeneralParams(generalObject, bidderRequest) {
     generalParams.userIds = JSON.stringify(userIdsParam);
   }
 
+  const userIdAsEids = getBidIdParameter('userIdAsEids', generalObject);
+  if (userIdAsEids) {
+    generalParams.userIdAsEids = JSON.stringify(userIdAsEids);
+  }
+
   const ortb2Metadata = bidderRequest.ortb2 || {};
   if (ortb2Metadata.site) {
     generalParams.site_metadata = JSON.stringify(ortb2Metadata.site);

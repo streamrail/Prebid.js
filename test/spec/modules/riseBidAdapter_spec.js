@@ -196,9 +196,18 @@ describe('riseAdapter', function () {
     });
 
     it('should send the correct currency in bid request', function () {
-      const expectedCurrency = 'USD';
-      const request = spec.buildRequests(bidRequests, bidderRequest)
-      expect(request.data.bids[0].currency).to.equal(expectedCurrency);
+      const bid = utils.deepClone(bidRequests[0]);
+      bid.params = {
+        'currency': 'EUR'
+      };
+      const defaultCurrency = 'USD';
+      const expectedCurrency = bid.params.currency || defaultCurrency;
+      const request = spec.buildRequests([bid], bidderRequest);
+      if (bid.params.currency) {
+        expect(request.data.bids[0].currency).to.equal(expectedCurrency);
+      } else {
+        expect(request.data.bids[0].currency).to.equal(defaultCurrency);
+      }
     });
 
     it('should respect syncEnabled option', function() {

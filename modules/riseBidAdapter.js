@@ -140,6 +140,8 @@ registerBidder(spec);
 /**
  * Get floor price
  * @param bid {bid}
+ * @param mediaType {string}
+ * @param currency {string}
  * @returns {Number}
  */
 function getFloor(bid, mediaType, currency) {

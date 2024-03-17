@@ -28,63 +28,6 @@ describe('riseAdapter', function () {
     });
   });
 
-  describe('isBidPosition Passed', function () {
-    let mediaType = BANNER
-    let bidObject = {};
-    const bid = {
-      bidder: 'rise',
-      mediaTypes: {
-        banner: {
-          pos: 1,
-          sizes: [
-            [
-              300,
-              250
-            ],
-            [
-              320,
-              480
-            ]
-          ]
-        }
-      }
-    }
-    function assignPos (bidObject, bid) {
-      const pos = utils.deepAccess(bid, `mediaTypes.${mediaType}.pos`);
-      if (pos || pos === 0) {
-        bidObject.pos = pos;
-      }
-      return pos;
-    }
-
-    it('bidObject should own pos property', function() {
-      const pos = assignPos(bidObject, bid);
-      expect(bidObject.pos).to.equal(pos);
-    })
-    it('bidObject should own pos property 0', function() {
-      bid.mediaTypes.banner.pos = 0;
-      const pos = assignPos(bidObject, bid);
-      expect(bidObject.pos).to.equal(pos);
-    })
-    it('bidObject should not own pos property', function() {
-      bidObject = {};
-      bid.mediaTypes.banner = {
-        sizes: [
-          [
-            300,
-            250
-          ],
-          [
-            320,
-            480
-          ]
-        ]
-      }
-      const pos = assignPos(bidObject, bid);
-      expect(bidObject.pos).to.equal(pos);
-    })
-  })
-
   describe('isBidRequestValid', function () {
     const bid = {
       'bidder': spec.code,
@@ -126,7 +69,8 @@ describe('riseAdapter', function () {
           'video': {
             'playerSize': [[640, 480]],
             'context': 'instream',
-            'plcmt': 1
+            'plcmt': 1,
+            'pos': 0
           }
         },
         'vastXml': '"<VAST version=\\\"2.0\\\">...</VAST>"'
@@ -173,6 +117,7 @@ describe('riseAdapter', function () {
     const api = [1, 2];
     const mimes = ['application/javascript', 'video/mp4', 'video/quicktime'];
     const protocols = [2, 3, 5, 6];
+    const pos = 4;
 
     it('sends the placementId to ENDPOINT via POST', function () {
       bidRequests[0].params.placementId = placementId;
@@ -499,6 +444,17 @@ describe('riseAdapter', function () {
       expect(data.bids[0].sua).to.deep.equal(sua);
       const request = spec.buildRequests(bidRequests, bidderRequest);
       expect(request.data.bids[0].sua).to.not.exist;
+    });
+
+    it('should send right position of the bid', function() {
+      const bid = utils.deepClone(bidRequests[1]);
+      const mediaType = bid.mediaTypes && bid.mediaTypes.banner ? BANNER : VIDEO;
+      bid.mediaTypes[mediaType].pos = pos;
+      const request = spec.buildRequests([bidRequests[0], bidRequests[1], bid], bidderRequest);
+      console.log(request.data.bids);
+      expect(request.data.bids[0].pos).to.equal(0);
+      expect(request.data.bids[1].pos).to.equal(undefined);
+      expect(request.data.bids[2].pos).to.equal(pos);
     });
 
     describe('COPPA Param', function() {

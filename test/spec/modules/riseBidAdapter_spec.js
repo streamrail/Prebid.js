@@ -451,7 +451,6 @@ describe('riseAdapter', function () {
       const mediaType = bid.mediaTypes && bid.mediaTypes.banner ? BANNER : VIDEO;
       bid.mediaTypes[mediaType].pos = pos;
       const request = spec.buildRequests([bidRequests[0], bidRequests[1], bid], bidderRequest);
-      console.log(request.data.bids);
       expect(request.data.bids[0].pos).to.equal(0);
       expect(request.data.bids[1].pos).to.equal(undefined);
       expect(request.data.bids[2].pos).to.equal(pos);

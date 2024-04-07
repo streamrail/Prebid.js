@@ -448,8 +448,7 @@ describe('riseAdapter', function () {
 
     it('should send right position of the bid', function() {
       const bid = utils.deepClone(bidRequests[1]);
-      const mediaType = bid.mediaTypes && bid.mediaTypes.banner ? BANNER : VIDEO;
-      bid.mediaTypes[mediaType].pos = pos;
+      bid.mediaTypes.banner.pos = pos;
       const request = spec.buildRequests([bidRequests[0], bidRequests[1], bid], bidderRequest);
       expect(request.data.bids[0].pos).to.equal(0);
       expect(request.data.bids[1].pos).to.equal(undefined);

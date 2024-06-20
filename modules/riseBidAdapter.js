@@ -313,7 +313,7 @@ function generateBidParameters(bid, bidderRequest) {
   };
 
   const pos = deepAccess(bid, `mediaTypes.${mediaType}.pos`);
-  if (pos) {
+  if (pos || pos === 0) {
     bidObject.pos = pos;
   }
 

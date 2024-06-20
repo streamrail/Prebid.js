@@ -69,7 +69,8 @@ describe('riseAdapter', function () {
           'video': {
             'playerSize': [[640, 480]],
             'context': 'instream',
-            'plcmt': 1
+            'plcmt': 1,
+            'pos': 0
           }
         },
         'vastXml': '"<VAST version=\\\"2.0\\\">...</VAST>"'
@@ -116,6 +117,7 @@ describe('riseAdapter', function () {
     const api = [1, 2];
     const mimes = ['application/javascript', 'video/mp4', 'video/quicktime'];
     const protocols = [2, 3, 5, 6];
+    const pos = 4;
 
     it('sends the placementId to ENDPOINT via POST', function () {
       bidRequests[0].params.placementId = placementId;
@@ -432,6 +434,15 @@ describe('riseAdapter', function () {
       expect(data.bids[0].sua).to.deep.equal(sua);
       const request = spec.buildRequests(bidRequests, bidderRequest);
       expect(request.data.bids[0].sua).to.not.exist;
+    });
+
+    it('should send right position of the bid', function() {
+      const bid = utils.deepClone(bidRequests[1]);
+      bid.mediaTypes.banner.pos = pos;
+      const request = spec.buildRequests([bidRequests[0], bidRequests[1], bid], bidderRequest);
+      expect(request.data.bids[0].pos).to.equal(0);
+      expect(request.data.bids[1].pos).to.equal(undefined);
+      expect(request.data.bids[2].pos).to.equal(pos);
     });
 
     describe('COPPA Param', function() {
